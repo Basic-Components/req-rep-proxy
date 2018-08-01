@@ -5,6 +5,7 @@ package proxy
 
 import (
 	zmq "github.com/pebbe/zmq4"
+	log "github.com/sirupsen/logrus"
 )
 
 func switchMessages(poller *zmq.Poller, frontend *zmq.Socket, backend *zmq.Socket) {
@@ -12,6 +13,10 @@ func switchMessages(poller *zmq.Poller, frontend *zmq.Socket, backend *zmq.Socke
 	for _, socket := range sockets {
 		switch s := socket.Socket; s {
 		case frontend:
+			log.WithFields(log.Fields{
+				"device":    "req-rep-proxy",
+				"direction": "request",
+				"socket":    s.String()}).Debug("Send message to server!")
 			for {
 				msg, _ := s.Recv(0)
 				if more, _ := s.GetRcvmore(); more {
@@ -22,6 +27,10 @@ func switchMessages(poller *zmq.Poller, frontend *zmq.Socket, backend *zmq.Socke
 				}
 			}
 		case backend:
+			log.WithFields(log.Fields{
+				"device":    "req-rep-proxy",
+				"direction": "response",
+				"socket":    s.String()}).Debug("Return message to client!")
 			for {
 				msg, _ := s.Recv(0)
 				if more, _ := s.GetRcvmore(); more {
