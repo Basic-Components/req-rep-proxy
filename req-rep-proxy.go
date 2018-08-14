@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	loadconfig "github.com/Basic-Components/req-rep-proxy/loadconfig"
 	proxy "github.com/Basic-Components/req-rep-proxy/proxy"
 	log "github.com/sirupsen/logrus"
 )
@@ -23,36 +24,56 @@ func closeHandler() {
 	}()
 
 }
-
-func main() {
+func makeConfig() loadconfig.Config {
 	var (
-		frontend  string
-		backend   string
-		h         bool
-		debug     bool
-		logFormat string
-		logOutput string
+		frontendURL string
+		backendURL  string
+		help        bool
+		debug       bool
+		logFormat   string
+		logOutput   string
+		configPath  string
 	)
-
-	flag.BoolVar(&h, "h", false, "帮助命令")
-	flag.BoolVar(&debug, "d", false, "是否使用debug模式启动")
-	flag.StringVar(&frontend, "f", "tcp://*:5559", "前端连接的地址")
-	flag.StringVar(&backend, "b", "tcp://*:5560", "后端绑定的地址")
-	flag.StringVar(&logFormat, "log_format", "json", "设定log的形式")
+	// 解析命令行参数
+	flag.BoolVar(&help, "help", false, "帮助命令")
+	flag.BoolVar(&debug, "debug", false, "是否使用debug模式启动")
+	flag.StringVar(&frontendURL, "frontend_url", "", "前端连接的地址")
+	flag.StringVar(&backendURL, "backend_url", "", "后端绑定的地址")
+	flag.StringVar(&logFormat, "log_format", "", "设定log的形式")
 	flag.StringVar(&logOutput, "log_output", "", "设定log输出的流位置")
-
+	flag.StringVar(&configPath, "config_path", "", "设定log输出的流位置")
 	flag.Parse()
-	if h {
+
+	//构造config
+	if help {
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
-	if debug {
+	var config = loadconfig.LoadConfig(configPath)
+	config.Debug = debug
+	if frontendURL != "" {
+		config.FrontendURL = frontendURL
+	}
+	if backendURL != "" {
+		config.BackendURL = backendURL
+	}
+	if logFormat != "" {
+		config.LogFormat = logFormat
+	}
+	if logOutput != "" {
+		config.LogOutput = logOutput
+	}
+	return config
+}
+
+func main() {
+	var config = makeConfig()
+	if config.Debug {
 		log.SetLevel(log.DebugLevel)
 	} else {
 		log.SetLevel(log.WarnLevel)
 	}
-
-	switch logFormat {
+	switch config.LogFormat {
 	case "json":
 		{
 			log.SetFormatter(&log.JSONFormatter{})
@@ -66,8 +87,7 @@ func main() {
 			log.SetFormatter(&log.JSONFormatter{})
 		}
 	}
-
-	if logOutput == "" {
+	if config.LogOutput == "" {
 		log.SetOutput(os.Stdout)
 	} else {
 		logFile, _ := os.OpenFile("logOutput", os.O_CREATE|os.O_WRONLY, 0666)
@@ -76,15 +96,14 @@ func main() {
 		log.SetOutput(mw)
 	}
 	log.WithFields(log.Fields{
-		"device": "req-rep-proxy",
-	}).Info("Device start !")
+		"Device": "req-rep-proxy",
+	}).Info("Server start !")
 	log.WithFields(log.Fields{
-		"device": "req-rep-proxy",
-	}).Info("server please connect to %s", backend)
+		"Device": "req-rep-proxy",
+	}).Info("Client should connect to url %s", config.FrontendURL)
 	log.WithFields(log.Fields{
-		"device": "req-rep-proxy",
-	}).Info("client please connect to %s", frontend)
+		"Device": "req-rep-proxy",
+	}).Info("Server should connect to url %s", config.BackendURL)
 	closeHandler()
-	proxy.Proxy(frontend, backend)
-
+	proxy.Proxy(config.FrontendURL, config.BackendURL)
 }

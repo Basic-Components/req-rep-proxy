@@ -14,9 +14,9 @@ func switchMessages(poller *zmq.Poller, frontend *zmq.Socket, backend *zmq.Socke
 		switch s := socket.Socket; s {
 		case frontend:
 			log.WithFields(log.Fields{
-				"device":    "req-rep-proxy",
-				"direction": "request",
-				"socket":    s.String()}).Debug("Send message to server!")
+				"Device":    "req-rep-proxy",
+				"Direction": "request",
+				"Socket":    s.String()}).Debug("Send message to server!")
 			for {
 				msg, _ := s.Recv(0)
 				if more, _ := s.GetRcvmore(); more {
@@ -28,9 +28,9 @@ func switchMessages(poller *zmq.Poller, frontend *zmq.Socket, backend *zmq.Socke
 			}
 		case backend:
 			log.WithFields(log.Fields{
-				"device":    "req-rep-proxy",
-				"direction": "response",
-				"socket":    s.String()}).Debug("Return message to client!")
+				"Device":    "req-rep-proxy",
+				"Direction": "response",
+				"Socket":    s.String()}).Debug("Return message to client!")
 			for {
 				msg, _ := s.Recv(0)
 				if more, _ := s.GetRcvmore(); more {
