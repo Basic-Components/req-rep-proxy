@@ -115,5 +115,5 @@ func main() {
 		consts.TYPE: consts.NAME,
 	}).Info("Server should connect to url " + config.BackendURL)
 	closeHandler()
-	proxy.Proxy(config)
+	proxy.Run(config)
 }

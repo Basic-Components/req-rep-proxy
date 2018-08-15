@@ -48,7 +48,7 @@ func switchMessages(poller *zmq.Poller, frontend *zmq.Socket, backend *zmq.Socke
 }
 
 // 代理本体
-func Proxy(config loadconfig.Config) {
+func Run(config loadconfig.Config) {
 	//  Prepare our sockets
 	frontend, _ := zmq.NewSocket(zmq.ROUTER)
 	defer frontend.Close()
