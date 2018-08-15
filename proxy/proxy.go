@@ -4,6 +4,9 @@
 package proxy
 
 import (
+	consts "github.com/Basic-Components/req-rep-proxy/consts"
+	loadconfig "github.com/Basic-Components/req-rep-proxy/loadconfig"
+
 	zmq "github.com/pebbe/zmq4"
 	log "github.com/sirupsen/logrus"
 )
@@ -14,7 +17,7 @@ func switchMessages(poller *zmq.Poller, frontend *zmq.Socket, backend *zmq.Socke
 		switch s := socket.Socket; s {
 		case frontend:
 			log.WithFields(log.Fields{
-				"Device":    "req-rep-proxy",
+				consts.TYPE: consts.NAME,
 				"Direction": "request",
 				"Socket":    s.String()}).Debug("Send message to server!")
 			for {
@@ -28,7 +31,7 @@ func switchMessages(poller *zmq.Poller, frontend *zmq.Socket, backend *zmq.Socke
 			}
 		case backend:
 			log.WithFields(log.Fields{
-				"Device":    "req-rep-proxy",
+				consts.TYPE: consts.NAME,
 				"Direction": "response",
 				"Socket":    s.String()}).Debug("Return message to client!")
 			for {
@@ -45,14 +48,14 @@ func switchMessages(poller *zmq.Poller, frontend *zmq.Socket, backend *zmq.Socke
 }
 
 // 代理本体
-func Proxy(bind_frontend string, bind_backend string) {
+func Proxy(config loadconfig.Config) {
 	//  Prepare our sockets
 	frontend, _ := zmq.NewSocket(zmq.ROUTER)
 	defer frontend.Close()
 	backend, _ := zmq.NewSocket(zmq.DEALER)
 	defer backend.Close()
-	frontend.Bind(bind_frontend)
-	backend.Bind(bind_backend)
+	frontend.Bind(config.FrontendURL)
+	backend.Bind(config.BackendURL)
 
 	//  Initialize poll set
 	poller := zmq.NewPoller()

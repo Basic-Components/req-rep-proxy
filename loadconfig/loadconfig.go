@@ -10,16 +10,18 @@ import (
 
 const defaultConfig string = `
 {
-"frontend_url":"tcp://*:5559",
-"backend_url":"tcp://*:5560",
-"debug":false,
-"log_format":"json",
-"log_output":"req-rep-proxy.log"
+	"server_name":"unknown",
+	"frontend_url":"tcp://*:5559",
+	"backend_url":"tcp://*:5560",
+	"debug":false,
+	"log_format":"json",
+	"log_output":""
 }
 `
 
 // Config json解析出来的配置结构
 type Config struct {
+	ServerName  string `json:"server_name"`
 	FrontendURL string `json:"frontend_url"`
 	BackendURL  string `json:"backend_url"`
 	LogFormat   string `json:"log_format"`
