@@ -8,16 +8,19 @@
 
 使用命令行`.req-rep-proxy`启动组件,下面是可选的参数:
 
-| 标志          | 默认值       | 说明                  |
-| ------------- | ------------ | --------------------- |
-| -help         | false        | 帮助命令              |
-| -debug        | false        | 是否使用debug模式启动 |
-| -server_name  | unknown      | 后端服务名            |
-| -frontend_url | tcp://*:5559 | 前端连接的地址        |
-| -backend_url  | tcp://*:5560 | 后端绑定的地址        |
-| -log_format   | json         | 设定log的形式         |
-| -log_output   | ""           | 设定log输出的流位置   |
-| -config_path  | ""           | 设定读取配置文件地址  |
+| 标志            | 类型   | 默认值         | 说明                                         |
+| --------------- | ------ | -------------- | -------------------------------------------- |
+| `-help`         | bool   | `false`        | 帮助命令                                     |
+| `-debug`        | bool   | `false`        | 是否使用debug模式启动                        |
+| `-server_name`  | string | `unknown`      | 后端服务名                                   |
+| `-frontend_url` | string | `tcp://*:5559` | 前端连接的地址                               |
+| `-backend_url`  | string | `tcp://*:5560` | 后端绑定的地址                               |
+| `-log_format`   | string | `json`         | 设定log的形式                                |
+| `-log_output`   | string | `空字符串`     | 设定log输出的流位置                          |
+| `-config_path`  | string | `空字符串`     | 设定读取配置文件地址                         |
+| `-conflate`     | bool   | `false`        | 描述是否缓存只保留最近的消息                 |
+| `-receive_hwm`  | int    | `1000`         | 描述接收端(前端)缓存的条数限制,`0`代表不限制 |
+| `-send_hwm`     | int    | `1000`         | 描述发送端(后端)缓存的条数限制,`0`代表不限制 |
 
 启动的时候按需求填入参数.
 
