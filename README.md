@@ -33,7 +33,10 @@
 	"backend_url":"tcp://*:5560",
 	"debug":false,
 	"log_format":"json",
-	"log_output":"req-rep-proxy.log"
+	"log_output":"",
+	"conflate":false,
+	"receive_hwm":1000,
+	"send_hwm":1000
 }
 ```
 
