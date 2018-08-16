@@ -54,6 +54,20 @@ func Run(config loadconfig.Config) {
 	defer frontend.Close()
 	backend, _ := zmq.NewSocket(zmq.DEALER)
 	defer backend.Close()
+
+	if config.Conflate {
+		frontend.SetConflate(true)
+		backend.SetConflate(true)
+	} else {
+		if config.RCVHWM >= 0 {
+			frontend.SetRcvhwm(config.RCVHWM)
+			backend.SetRcvhwm(config.RCVHWM)
+		}
+		if config.SNDHWM >= 0 {
+			frontend.SetSndhwm(config.SNDHWM)
+			backend.SetSndhwm(config.SNDHWM)
+		}
+	}
 	frontend.Bind(config.FrontendURL)
 	backend.Bind(config.BackendURL)
 

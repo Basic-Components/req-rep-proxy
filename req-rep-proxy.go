@@ -30,6 +30,9 @@ func makeConfig() loadconfig.Config {
 	var (
 		help        bool
 		debug       bool
+		conflate    bool
+		sndHWM      int
+		rcvHWM      int
 		serverName  string
 		frontendURL string
 		backendURL  string
@@ -40,6 +43,9 @@ func makeConfig() loadconfig.Config {
 	// 解析命令行参数
 	flag.BoolVar(&help, "help", false, "帮助命令")
 	flag.BoolVar(&debug, "debug", false, "是否使用debug模式启动")
+	flag.BoolVar(&conflate, "conflate", false, "是否只保留最后到来的消息")
+	flag.IntVar(&sndHWM, "send_hwm", -1, "发送端的缓存长度")
+	flag.IntVar(&rcvHWM, "receive_hwm", -1, "接收端的缓存长度")
 	flag.StringVar(&serverName, "server_name", "", "后端连接的服务名")
 	flag.StringVar(&frontendURL, "frontend_url", "", "前端连接的地址")
 	flag.StringVar(&backendURL, "backend_url", "", "后端绑定的地址")
@@ -58,6 +64,13 @@ func makeConfig() loadconfig.Config {
 	}
 	var config = loadconfig.LoadConfig(configPath)
 	config.Debug = debug
+	config.Conflate = conflate
+	if sndHWM >= 0 {
+		config.SNDHWM = sndHWM
+	}
+	if rcvHWM >= 0 {
+		config.RCVHWM = rcvHWM
+	}
 	if serverName != "" {
 		config.ServerName = serverName
 	}
